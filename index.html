@@ -1,0 +1,1374 @@
+<!-- <!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>to-do-</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HomeHub — Family Home Manager</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+:root{
+  --navy:#0f2744;--navy2:#1B3A5C;--blue:#2563A8;--blue2:#3A7BD5;--sky:#EAF3FB;
+  --surface:#F2F7FC;--white:#fff;--border:#C5DDF0;--muted:#6B8AA8;
+  --ok:#1A7A4A;--bad:#C0392B;--warn:#C47D10;--purple:#6D28D9;--teal:#0891B2;
+}
+
+/* ═══ AUTH ═══ */
+#auth{position:fixed;inset:0;background:linear-gradient(140deg,#091c36 0%,#1B3A5C 45%,#2563A8 80%,#5B9BD5 100%);display:flex;align-items:center;justify-content:center;z-index:9999}
+.auth-deco1{position:absolute;width:420px;height:420px;border-radius:50%;border:70px solid rgba(255,255,255,.05);left:-130px;top:-100px;pointer-events:none}
+.auth-deco2{position:absolute;width:320px;height:320px;border-radius:50%;border:50px solid rgba(255,255,255,.05);right:-80px;bottom:-80px;pointer-events:none}
+.auth-panel{background:rgba(255,255,255,.97);border-radius:22px;padding:42px 38px;width:100%;max-width:460px;position:relative;z-index:2;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.auth-logo{text-align:center;margin-bottom:30px}
+.auth-logo-icon{font-size:48px;display:block;margin-bottom:10px}
+.auth-logo h1{font-family:Georgia,serif;font-size:26px;color:var(--navy);margin-bottom:5px;font-weight:700}
+.auth-logo p{font-size:13px;color:var(--muted)}
+.auth-err{background:#fff0f0;border:1.5px solid #f0a0a0;border-radius:9px;padding:9px 13px;font-size:12px;color:var(--bad);margin-bottom:14px;display:none}
+.afl{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;display:block}
+.ai{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;font-size:13px;background:#f6fafd;color:var(--navy);outline:none;transition:border .15s}
+.ai:focus{border-color:var(--blue)}
+.pw-wrap{position:relative}
+.pw-wrap .ai{padding-right:42px}
+.pw-eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:3px;display:flex;align-items:center;line-height:1}
+.auth-field{margin-bottom:14px}
+.auth-g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.auth-btn{width:100%;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:13px;font-weight:700;font-size:14px;cursor:pointer;margin-top:4px;letter-spacing:.3px;transition:background .15s}
+.auth-btn:hover{background:#1a4f9a}
+.auth-alt{text-align:center;margin-top:16px;font-size:12px;color:var(--muted)}
+.auth-alt b{color:var(--blue);cursor:pointer;font-weight:700}
+.auth-demo{margin-top:18px;background:#f0f7ff;border:1px solid var(--border);border-radius:9px;padding:11px 14px;font-size:11px;color:var(--muted);line-height:1.7}
+
+/* ═══ APP SHELL ═══ */
+#app{display:none;width:100vw;height:100vh;flex-direction:row;overflow:hidden}
+
+/* ═══ SIDEBAR ═══ */
+.sb{width:252px;min-width:252px;background:var(--navy);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.sb-head{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:11px;flex-shrink:0}
+.sb-head-icon{font-size:28px}
+.sb-head-title{font-family:Georgia,serif;color:#7bc8f0;font-size:20px;font-weight:700;letter-spacing:.3px}
+.sb-user{padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sb-av{width:38px;height:38px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:2px solid #4A90D9;flex-shrink:0}
+.sb-uname{font-size:13px;font-weight:700;color:#e2f0fb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.sb-urole{font-size:10px;color:#7bc8f0;margin-top:1px}
+.sb-out{background:none;border:1px solid rgba(100,160,220,.4);color:#9bbddd;cursor:pointer;font-size:11px;padding:3px 9px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.sb-out:hover{background:rgba(255,255,255,.1);color:#fff}
+.sb-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:10px 0}
+.sb-scroll::-webkit-scrollbar{width:4px}
+.sb-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px}
+.sb-group{margin-bottom:2px}
+.sb-gh{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;cursor:pointer;user-select:none;color:#7bc8f0;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;transition:background .1s}
+.sb-gh:hover{background:rgba(255,255,255,.05)}
+.sb-gh .arr{font-size:12px;transition:transform .22s;color:#5a8ab0}
+.sb-gh.open .arr{transform:rotate(180deg)}
+.sb-items{max-height:0;overflow:hidden;transition:max-height .25s ease}
+.sb-items.open{max-height:600px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px 8px 26px;cursor:pointer;color:#9bbddd;font-size:12.5px;font-weight:500;transition:all .13s;border-left:3px solid transparent}
+.sb-item:hover{background:rgba(255,255,255,.07);color:#e2f0fb}
+.sb-item.act{background:rgba(37,99,168,.4);color:#fff;border-left-color:#7bc8f0;font-weight:700}
+.sb-item-ic{font-size:15px;width:19px;text-align:center;flex-shrink:0}
+.sb-footer{padding:10px 0;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.sb-footer-btn{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;color:#9bbddd;font-size:12.5px;font-weight:500;transition:all .13s;border-left:3px solid transparent}
+.sb-footer-btn:hover{background:rgba(255,255,255,.07);color:#fff}
+.sb-footer-btn.act{color:#fff;border-left-color:#7bc8f0}
+
+/* ═══ MAIN CONTENT ═══ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:var(--surface)}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:56px;flex-shrink:0}
+.tb-left{}
+.tb-title{font-family:Georgia,serif;color:var(--navy);font-size:17px;font-weight:700;line-height:1.2}
+.tb-crumb{font-size:11px;color:var(--muted);margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:14px}
+.tb-user{font-size:12px;color:var(--muted);background:var(--sky);padding:5px 12px;border-radius:20px;border:1px solid var(--border)}
+.content{flex:1;overflow-y:auto;padding:26px 30px;background:var(--surface)}
+.content::-webkit-scrollbar{width:6px}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ═══ REUSABLE UI ═══ */
+.card{background:var(--white);border-radius:14px;padding:18px 20px;margin-bottom:16px;border:1px solid var(--border)}
+.card-title{font-weight:700;color:var(--navy);font-size:13px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.grid-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.stat-box{background:var(--sky);border-radius:12px;padding:14px 16px;text-align:center;border:1px solid var(--border)}
+.stat-n{font-size:24px;font-weight:700;color:var(--navy)}
+.stat-l{font-size:11px;color:var(--muted);margin-top:2px}
+.row-it{display:flex;align-items:center;gap:9px;padding:10px 14px;background:var(--white);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)}
+.row-it.done{background:var(--sky);opacity:.8}
+.row-it.ov{background:#fff4f4;border-color:#f0a0a0}
+.ri-m{flex:1;min-width:0}
+.ri-t{font-weight:600;color:var(--navy);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ri-s{font-size:11px;color:var(--muted);margin-top:2px}
+.bdg{font-size:10px;font-weight:700;border-radius:20px;padding:2px 10px;white-space:nowrap;flex-shrink:0}
+.inp{border:1px solid var(--border);border-radius:8px;padding:8px 11px;font-size:12.5px;background:var(--sky);color:var(--navy);width:100%;outline:none;font-family:inherit}
+.inp:focus{border-color:var(--blue)}
+.pbtn{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.pbtn:hover{background:#1a4f9a}
+.gbtn{background:var(--ok);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-weight:600;font-size:11px;cursor:pointer;font-family:inherit}
+.rbtn{background:var(--bad);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-weight:600;font-size:11px;cursor:pointer;font-family:inherit}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:10px}
+.fl{font-size:11px;color:var(--muted);margin-bottom:3px;font-weight:600;display:block}
+.two-col{display:flex;gap:18px;align-items:flex-start}
+.two-col .left{flex:1;min-width:0}
+.two-col .right{width:230px;flex-shrink:0}
+.info-box{border:1.5px solid #7bb8e8;background:#e8f4fd;border-radius:12px;padding:14px 17px;margin-bottom:14px}
+.warn-box{border:1.5px solid #f0a0a0;background:#fff4f4;border-radius:12px;padding:14px 17px;margin-bottom:14px}
+.mbar-wrap{margin-bottom:9px}
+.mbar-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:3px}
+.mbar-row span:last-child{font-weight:700;color:var(--navy)}
+.mbar-bg{background:var(--border);border-radius:4px;height:7px}
+.mbar-fill{border-radius:4px;height:7px;transition:width .4s}
+.prog-bg{background:var(--border);border-radius:6px}
+.prog-fill{border-radius:6px;transition:width .5s}
+.chart-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.legend{display:flex;flex-direction:column;gap:5px;flex:1;min-width:110px}
+.leg-row{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--navy)}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.page-title{font-family:Georgia,serif;color:var(--navy);font-size:20px;font-weight:700;margin-bottom:18px}
+
+/* HELP STYLES */
+.help-hero{background:linear-gradient(135deg,#1B3A5C,#2563A8);border-radius:16px;padding:28px 30px;margin-bottom:24px;color:#fff}
+.help-hero h2{font-family:Georgia,serif;font-size:22px;margin-bottom:8px}
+.help-hero p{font-size:13px;opacity:.85;line-height:1.6;max-width:580px}
+.help-section{margin-bottom:28px}
+.help-section h3{font-family:Georgia,serif;color:var(--navy);font-size:15px;margin-bottom:12px;padding-bottom:7px;border-bottom:2px solid var(--sky)}
+.help-step{display:flex;gap:13px;margin-bottom:10px;padding:12px 15px;background:var(--sky);border-radius:10px;border-left:3px solid var(--blue)}
+.hs-num{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.hs-body{}
+.hs-title{font-weight:700;color:var(--navy);font-size:12.5px;margin-bottom:3px}
+.hs-desc{font-size:11.5px;color:var(--muted);line-height:1.55}
+.help-tip{background:#e2f5eb;border:1px solid #aad9bb;border-radius:10px;padding:13px 16px;font-size:12px;color:#085041;margin-top:8px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ AUTH SCREEN ═══════════════ -->
+<div id="auth">
+  <div class="auth-deco1"></div>
+  <div class="auth-deco2"></div>
+  <div class="auth-panel" id="auth-panel">
+    <!-- LOGIN -->
+    <div id="login-view">
+      <div class="auth-logo">
+        <span class="auth-logo-icon">🏠</span>
+        <h1>Welcome Back</h1>
+        <p>Sign in to your HomeHub account</p>
+      </div>
+      <div class="auth-err" id="login-err"></div>
+      <div class="auth-field">
+        <span class="afl">Email Address</span>
+        <input class="ai" id="li-email" type="email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="auth-field">
+        <span class="afl">Password</span>
+        <div class="pw-wrap">
+          <input class="ai" id="li-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+          <button class="pw-eye" onclick="toggleEye('li-pass','li-eye')" type="button"><span id="li-eye">👁</span></button>
+        </div>
+      </div>
+      <button class="auth-btn" onclick="doLogin()">Log In</button>
+      <div class="auth-alt">Don't have an account? <b onclick="showView('signup')">Sign Up</b></div>
+      <div class="auth-demo">
+        <strong>Demo accounts</strong> — password for all: <strong>1234</strong><br>
+        aarav@family.com &nbsp;·&nbsp; priya@family.com &nbsp;·&nbsp; riya@family.com
+      </div>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="signup-view" style="display:none">
+      <div class="auth-logo">
+        <span class="auth-logo-icon">🏠</span>
+        <h1>Create Account</h1>
+        <p>Join HomeHub — manage your home together</p>
+      </div>
+      <div class="auth-err" id="su-err"></div>
+      <div class="auth-g2">
+        <div class="auth-field"><span class="afl">Full Name</span><input class="ai" id="su-name" placeholder="Aarav Sharma"></div>
+        <div class="auth-field"><span class="afl">Role</span><select class="ai" id="su-role"><option>Parent</option><option>Child</option><option>Other</option></select></div>
+      </div>
+      <div class="auth-field"><span class="afl">Email Address</span><input class="ai" id="su-email" type="email" placeholder="you@example.com"></div>
+      <div class="auth-g2">
+        <div class="auth-field"><span class="afl">Password</span>
+          <div class="pw-wrap"><input class="ai" id="su-pass" type="password" placeholder="••••••••"><button class="pw-eye" onclick="toggleEye('su-pass','su-eye1')" type="button"><span id="su-eye1">👁</span></button></div>
+        </div>
+        <div class="auth-field"><span class="afl">Confirm Password</span>
+          <div class="pw-wrap"><input class="ai" id="su-pass2" type="password" placeholder="••••••••"><button class="pw-eye" onclick="toggleEye('su-pass2','su-eye2')" type="button"><span id="su-eye2">👁</span></button></div>
+        </div>
+      </div>
+      <button class="auth-btn" onclick="doSignup()">Create Account</button>
+      <div class="auth-alt">Already have an account? <b onclick="showView('login')">Log In</b></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <div class="sb">
+    <div class="sb-head">
+      <span class="sb-head-icon">🏠</span>
+      <span class="sb-head-title">HomeHub</span>
+    </div>
+    <div class="sb-user">
+      <div class="sb-av" id="sb-av"></div>
+      <div style="flex:1;min-width:0">
+        <div class="sb-uname" id="sb-uname"></div>
+        <div class="sb-urole" id="sb-urole"></div>
+      </div>
+      <button class="sb-out" onclick="logout()">Logout</button>
+    </div>
+    <div class="sb-scroll" id="sb-nav"></div>
+    <div class="sb-footer">
+      <div class="sb-footer-btn" id="sb-help" onclick="nav('help')"><span class="sb-item-ic">❓</span><span>Help & Guide</span></div>
+      <div class="sb-footer-btn" id="sb-fam" onclick="nav('family')"><span class="sb-item-ic">👨‍👩‍👧</span><span>Family & Connections</span></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-left">
+        <div class="tb-title" id="tb-title">HomeHub</div>
+        <div class="tb-crumb" id="tb-crumb"></div>
+      </div>
+      <div class="tb-right">
+        <span class="tb-user" id="tb-user"></span>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA & STATE
+// ═══════════════════════════════════════════════
+const T=()=>new Date().toISOString().slice(0,10);
+const aD=(d,n)=>{let x=new Date(d+'T00:00:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
+const fD=d=>d?new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+const mk=d=>d?d.slice(0,7):'';
+const fM=m=>m?new Date(m+'-01').toLocaleDateString('en-US',{month:'long',year:'numeric'}):'';
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const CLRS=['#2563a8','#1a7a4a','#c47d10','#6d28d9','#c0392b','#0891b2','#b45309','#be185d','#065f46','#7c3aed'];
+
+let CU=null; // current user
+let users=[
+  {id:'u1',name:'Aarav Sharma',email:'aarav@family.com',password:'1234',avatar:'AS',role:'Parent'},
+  {id:'u2',name:'Priya Sharma',email:'priya@family.com',password:'1234',avatar:'PS',role:'Parent'},
+  {id:'u3',name:'Riya Sharma',email:'riya@family.com',password:'1234',avatar:'RS',role:'Child'},
+];
+let conns=[
+  {id:'c1',from:'u1',to:'u2',status:'accepted'},
+  {id:'c2',from:'u1',to:'u3',status:'accepted'},
+];
+let D={
+  tasks:[
+    {id:'t1',text:'Buy groceries',done:false,priority:'High',due:T(),aTo:'u1',by:'Aarav'},
+    {id:'t2',text:'Pay electricity bill',done:false,priority:'High',due:T(),aTo:'u2',by:'Priya'},
+    {id:'t3',text:"Riya's school fees",done:true,priority:'Medium',due:aD(T(),-2),aTo:'u1',by:'Aarav'},
+    {id:'t4',text:'Fix leaking tap',done:false,priority:'Low',due:aD(T(),3),aTo:'u1',by:'Aarav'},
+  ],
+  events:[
+    {id:'e1',title:'Tihar celebration',date:aD(T(),7),time:'06:00',type:'Event',by:'Aarav'},
+    {id:'e2',title:'Doctor appointment',date:aD(T(),3),time:'10:30',type:'Medical',by:'Priya'},
+    {id:'e3',title:"Riya's Birthday",date:aD(T(),14),time:'00:00',type:'Birthday',by:'Priya'},
+  ],
+  chores:[
+    {id:'ch1',name:'Wash dishes',freq:'Daily',aTo:'u3',day:'Every day',done:false,doneBy:null},
+    {id:'ch2',name:'Mop floors',freq:'Weekly',aTo:'u2',day:'Saturday',done:false,doneBy:null},
+    {id:'ch3',name:'Take out trash',freq:'Weekly',aTo:'u1',day:'Sunday',done:true,doneBy:'Aarav'},
+  ],
+  contacts:[
+    {id:'co1',name:'Dr. Poudel',phone:'+977-9841234567',cat:'Medical',notes:'Family doctor'},
+    {id:'co2',name:'Hari Electrician',phone:'+977-9851234567',cat:'Service',notes:'24hr available'},
+    {id:'co3',name:'Police Station',phone:'100',cat:'Emergency',notes:'Local station'},
+    {id:'co4',name:'Ram Plumber',phone:'+977-9861234567',cat:'Service',notes:''},
+  ],
+  bills:[
+    {id:'b1',type:'Electricity',amount:1850,due:aD(T(),5),paid:null,period:'May 2026'},
+    {id:'b2',type:'Waste Management',amount:300,due:aD(T(),10),paid:null,period:'May 2026'},
+    {id:'b3',type:'Internet',amount:1200,due:aD(T(),3),paid:null,period:'May 2026'},
+    {id:'b4',type:'Electricity',amount:1620,due:aD(T(),-30),paid:aD(T(),-28),period:'Apr 2026'},
+    {id:'b5',type:'Waste Management',amount:300,due:aD(T(),-30),paid:aD(T(),-25),period:'Apr 2026'},
+  ],
+  grocery:[
+    {id:'g1',name:'Rice (5kg)',price:650,qty:1,date:T(),cat:'Staples'},
+    {id:'g2',name:'Milk (1L)',price:100,qty:4,date:T(),cat:'Dairy'},
+    {id:'g3',name:'Cooking Oil',price:280,qty:2,date:T(),cat:'Staples'},
+    {id:'g4',name:'Lentils (1kg)',price:200,qty:2,date:aD(T(),-32),cat:'Staples'},
+    {id:'g5',name:'Tomatoes',price:60,qty:3,date:aD(T(),-32),cat:'Vegetables'},
+    {id:'g6',name:'Bread',price:80,qty:2,date:aD(T(),-32),cat:'Bakery'},
+  ],
+  gas:[
+    {id:'gas1',start:aD(T(),-65),end:aD(T(),-35),kg:14.2,cost:2100},
+    {id:'gas2',start:aD(T(),-35),end:aD(T(),-5),kg:14.2,cost:2200},
+    {id:'gas3',start:aD(T(),-5),end:null,kg:14.2,cost:2200},
+  ],
+  meds:[
+    {id:'m1',name:'Vitamin D',dose:'1 tablet',freq:'Daily',aTo:'u1',stock:28,notes:'After breakfast',taken:[]},
+    {id:'m2',name:'Calcium',dose:'500mg',freq:'Daily',aTo:'u2',stock:4,notes:'With water',taken:[]},
+  ],
+  maint:[
+    {id:'mn1',name:'AC Servicing',cat:'HVAC',days:90,last:aD(T(),-80),next:aD(T(),10),cost:1500,notes:'',hist:[]},
+    {id:'mn2',name:'Pest Control',cat:'Pest',days:180,last:aD(T(),-20),next:aD(T(),160),cost:2000,notes:'',hist:[]},
+    {id:'mn3',name:'Water Tank Cleaning',cat:'Plumbing',days:90,last:aD(T(),-95),next:aD(T(),-5),cost:500,notes:'',hist:[]},
+  ],
+  water:[
+    {id:'w1',date:T(),level:'75%',liters:50,cost:0,notes:'',by:'Aarav'},
+  ],
+  wash:[
+    {id:'wl1',date:aD(T(),-7),time:'09:00',load:'Full',notes:'Bedsheets'},
+    {id:'wl2',date:T(),time:'10:00',load:'Half',notes:'Clothes'},
+  ],
+  savings:[
+    {id:'s1',name:'Dashain Fund',target:50000,saved:18000,deadline:aD(T(),60),cat:'Festival',notes:''},
+    {id:'s2',name:'New Refrigerator',target:35000,saved:8000,deadline:aD(T(),120),cat:'Appliance',notes:''},
+  ],
+  budgets:[],
+  feed:[
+    {user:'Aarav',action:"added task 'Buy groceries'",time:'9:30 AM'},
+    {user:'Priya',action:'paid electricity bill for Apr 2026',time:'Yesterday'},
+  ],
+  tankSize:1000,
+  gMonth:mk(T()),
+  rMonth:mk(T()),
+  bMonth:mk(T()),
+};
+
+// ═══════════════════════════════════════════════
+// NAV CONFIG
+// ═══════════════════════════════════════════════
+const GROUPS=[
+  {id:'home',label:'HOME',items:[
+    {id:'todo',ic:'✅',label:'To-Do List'},
+    {id:'calendar',ic:'📅',label:'Calendar'},
+    {id:'chores',ic:'🧹',label:'Chore Schedule'},
+    {id:'contacts',ic:'📞',label:'Contacts'},
+  ]},
+  {id:'finance',label:'FINANCE',items:[
+    {id:'grocery',ic:'🛒',label:'Grocery'},
+    {id:'bills',ic:'💡',label:'Bills'},
+    {id:'gas',ic:'⛽',label:'Gas Tracker'},
+    {id:'budget',ic:'📊',label:'Budget Planner'},
+    {id:'report',ic:'📈',label:'Monthly Report'},
+    {id:'savings',ic:'🎯',label:'Savings Goals'},
+  ]},
+  {id:'util',label:'UTILITIES',items:[
+    {id:'water',ic:'💧',label:'Water Tracker'},
+    {id:'washing',ic:'🫧',label:'Washing Machine'},
+    {id:'maint',ic:'🔧',label:'Maintenance'},
+  ]},
+  {id:'health',label:'HEALTH',items:[
+    {id:'medicine',ic:'💊',label:'Medicine Tracker'},
+  ]},
+];
+let openG={home:true,finance:true,util:false,health:false};
+let curPage='todo';
+let famSearch='',famResult=null;
+let tfilt='All';
+let gMonth=mk(T()),bMonth=mk(T()),rMonth=mk(T());
+
+// ═══════════════════════════════════════════════
+// AUTH FUNCTIONS
+// ═══════════════════════════════════════════════
+function toggleEye(inp,span){
+  const el=document.getElementById(inp),ic=document.getElementById(span);
+  el.type=el.type==='password'?'text':'password';
+  ic.textContent=el.type==='password'?'👁':'🙈';
+}
+function showView(v){
+  document.getElementById('login-view').style.display=v==='login'?'':'none';
+  document.getElementById('signup-view').style.display=v==='signup'?'':'none';
+}
+function showErr(id,msg){const el=document.getElementById(id);el.style.display='block';el.textContent=msg;}
+function hideErr(id){document.getElementById(id).style.display='none';}
+function doLogin(){
+  hideErr('login-err');
+  const email=document.getElementById('li-email').value.trim();
+  const pass=document.getElementById('li-pass').value;
+  const u=users.find(u=>u.email===email&&u.password===pass);
+  if(!u){showErr('login-err','Invalid email or password. Try aarav@family.com / 1234');return;}
+  CU=u;startApp();
+}
+function doSignup(){
+  hideErr('su-err');
+  const name=document.getElementById('su-name').value.trim();
+  const email=document.getElementById('su-email').value.trim();
+  const pass=document.getElementById('su-pass').value;
+  const pass2=document.getElementById('su-pass2').value;
+  const role=document.getElementById('su-role').value;
+  if(!name||!email||!pass){showErr('su-err','All fields are required.');return;}
+  if(pass!==pass2){showErr('su-err','Passwords do not match.');return;}
+  if(users.find(u=>u.email===email)){showErr('su-err','An account with this email already exists.');return;}
+  const nu={id:uid(),name,email,password:pass,avatar:name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),role};
+  users.push(nu);CU=nu;startApp();
+}
+function startApp(){
+  document.getElementById('auth').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('sb-av').textContent=CU.avatar;
+  document.getElementById('sb-uname').textContent=CU.name;
+  document.getElementById('sb-urole').textContent=CU.role+' Account';
+  document.getElementById('tb-user').textContent='👤 '+CU.name;
+  buildSidebar();nav('todo');
+}
+function logout(){
+  CU=null;
+  document.getElementById('auth').style.display='flex';
+  document.getElementById('app').style.display='none';
+  document.getElementById('li-email').value='';
+  document.getElementById('li-pass').value='';
+}
+
+// ═══════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════
+function buildSidebar(){
+  const navEl=document.getElementById('sb-nav');
+  navEl.innerHTML=GROUPS.map(g=>`
+    <div class="sb-group">
+      <div class="sb-gh${openG[g.id]?' open':''}" onclick="toggleGrp('${g.id}')">
+        <span>${g.label}</span><span class="arr">▾</span>
+      </div>
+      <div class="sb-items${openG[g.id]?' open':''}" id="sg-${g.id}">
+        ${g.items.map(it=>`<div class="sb-item${curPage===it.id?' act':''}" id="si-${it.id}" onclick="nav('${it.id}')"><span class="sb-item-ic">${it.ic}</span><span>${it.label}</span></div>`).join('')}
+      </div>
+    </div>`).join('');
+  document.getElementById('sb-help').className='sb-footer-btn'+(curPage==='help'?' act':'');
+  document.getElementById('sb-fam').className='sb-footer-btn'+(curPage==='family'?' act':'');
+}
+function toggleGrp(gid){openG[gid]=!openG[gid];buildSidebar();}
+function nav(page){
+  curPage=page;
+  const allItems=GROUPS.flatMap(g=>g.items);
+  const found=allItems.find(i=>i.id===page);
+  const grp=GROUPS.find(g=>g.items.some(i=>i.id===page));
+  document.getElementById('tb-title').textContent=
+    page==='help'?'Help & Guide':page==='family'?'Family & Connections':found?found.label:'HomeHub';
+  document.getElementById('tb-crumb').textContent=grp?grp.label+' ›':page==='family'?'FAMILY ›':page==='help'?'SUPPORT ›':'';
+  buildSidebar();
+  document.getElementById('content').innerHTML=render(page);
+}
+
+// ═══════════════════════════════════════════════
+// HELPER HTML GENERATORS
+// ═══════════════════════════════════════════════
+function bdg(t,c,b){return`<span class="bdg" style="color:${c};background:${b}">${t}</span>`;}
+function mbar(lbl,val,max,clr){
+  const p=max?Math.min(100,Math.round(val/max*100)):0;
+  return`<div class="mbar-wrap"><div class="mbar-row"><span>${lbl}</span><span>NPR ${val.toLocaleString()}</span></div><div class="mbar-bg"><div class="mbar-fill" style="width:${p}%;background:${clr}"></div></div></div>`;
+}
+function prog(pct,clr,h=8){return`<div class="prog-bg" style="height:${h}px"><div class="prog-fill" style="width:${Math.min(100,pct)}%;background:${clr};height:${h}px"></div></div>`;}
+function svgPie(data,sz=130){
+  const t=data.reduce((s,d)=>s+(d.v||0),0);
+  if(!t)return`<div style="width:${sz}px;height:${sz}px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted)">No data</div>`;
+  let a=-Math.PI/2;const cx=sz/2,cy=sz/2,r=sz/2-7;
+  const paths=data.filter(d=>d.v>0).map(d=>{
+    const ang=(d.v/t)*2*Math.PI;
+    const x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a);
+    a+=ang;
+    const x2=cx+r*Math.cos(a),y2=cy+r*Math.sin(a);
+    return`<path d="M${cx},${cy}L${x1.toFixed(1)},${y1.toFixed(1)}A${r},${r},0,${ang>Math.PI?1:0},1,${x2.toFixed(1)},${y2.toFixed(1)}Z" fill="${d.c}" stroke="#fff" stroke-width="2"/>`;
+  });
+  return`<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}">${paths.join('')}<circle cx="${cx}" cy="${cy}" r="${(r*.42).toFixed(1)}" fill="var(--white)"/></svg>`;
+}
+function svgLegend(data){
+  const t=data.reduce((s,d)=>s+(d.v||0),0);
+  return`<div class="legend">${data.filter(d=>d.v>0).map(d=>`<div class="leg-row"><div class="leg-dot" style="background:${d.c}"></div><span><b>${d.l}</b> — ${t?Math.round(d.v/t*100):0}%</span></div>`).join('')}</div>`;
+}
+function pieCard(data,title){
+  return`<div class="card"><div class="card-title">${title}</div><div class="chart-row">${svgPie(data)}${svgLegend(data)}</div></div>`;
+}
+function donut(done,tot){
+  const p=tot?done/tot:0,r=36,cx=50,cy=50,sw=9,ci=2*Math.PI*r;
+  return`<svg width="100" height="100" viewBox="0 0 100 100" style="flex-shrink:0">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--border)" stroke-width="${sw}"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--blue)" stroke-width="${sw}" stroke-dasharray="${(p*ci).toFixed(1)} ${ci.toFixed(1)}" stroke-dashoffset="${(ci/4).toFixed(1)}" stroke-linecap="round"/>
+    <text x="${cx}" y="${cy-3}" text-anchor="middle" font-size="13" font-weight="700" fill="var(--navy)">${Math.round(p*100)}%</text>
+    <text x="${cx}" y="${cy+11}" text-anchor="middle" font-size="9" fill="var(--muted)">${done}/${tot} done</text>
+  </svg>`;
+}
+function famUsers(){
+  const mc=conns.filter(c=>(c.from===CU.id||c.to===CU.id)&&c.status==='accepted');
+  const ids=[CU.id,...mc.map(c=>c.from===CU.id?c.to:c.from)];
+  return ids.map(i=>users.find(u=>u.id===i)).filter(Boolean);
+}
+
+// ═══════════════════════════════════════════════
+// PAGE RENDERER
+// ═══════════════════════════════════════════════
+function render(p){
+  if(p==='todo') return renderTodo();
+  if(p==='calendar') return renderCalendar();
+  if(p==='chores') return renderChores();
+  if(p==='contacts') return renderContacts();
+  if(p==='grocery') return renderGrocery();
+  if(p==='bills') return renderBills();
+  if(p==='gas') return renderGas();
+  if(p==='budget') return renderBudget();
+  if(p==='report') return renderReport();
+  if(p==='savings') return renderSavings();
+  if(p==='water') return renderWater();
+  if(p==='washing') return renderWashing();
+  if(p==='maint') return renderMaint();
+  if(p==='medicine') return renderMedicine();
+  if(p==='family') return renderFamily();
+  if(p==='help') return renderHelp();
+  return '<p>Page not found</p>';
+}
+
+// ═══════════════════════════════════════════════
+// TODO
+// ═══════════════════════════════════════════════
+function renderTodo(){
+  const tasks=D.tasks;
+  const done=tasks.filter(t=>t.done).length;
+  const shown=tasks.filter(t=>tfilt==='All'?true:tfilt==='Mine'?t.aTo===CU.id:tfilt==='Pending'?!t.done:t.done);
+  const pc={High:['#c0392b','#fde8e6'],Medium:['#c47d10','#fef3e2'],Low:['#1a7a4a','#e2f5eb']};
+  const pieD=[{l:'High',v:tasks.filter(t=>t.priority==='High').length,c:'#c0392b'},{l:'Medium',v:tasks.filter(t=>t.priority==='Medium').length,c:'#c47d10'},{l:'Low',v:tasks.filter(t=>t.priority==='Low').length,c:'#1a7a4a'}];
+  const filters=['All','Mine','Pending','Done'];
+  const cnt={All:tasks.length,Mine:tasks.filter(t=>t.aTo===CU.id).length,Pending:tasks.filter(t=>!t.done).length,Done:done};
+  return`
+  <div class="two-col">
+    <div class="left">
+      <div style="display:flex;gap:14px;align-items:center;margin-bottom:18px">
+        ${donut(done,tasks.length)}
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:1">
+          ${filters.map(f=>`<div onclick="tfilt='${f}';nav('todo')" style="text-align:center;padding:9px 4px;border-radius:10px;cursor:pointer;background:${tfilt===f?'var(--blue)':'var(--sky)'};color:${tfilt===f?'#fff':'var(--navy)'};font-weight:600;font-size:11.5px;border:1px solid var(--border)"><div style="font-size:20px;font-weight:700">${cnt[f]}</div>${f}</div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">＋ Add Task</div>
+        <div style="display:grid;grid-template-columns:1fr 100px 130px 80px;gap:8px;margin-bottom:0">
+          <input class="inp" id="tt" placeholder="Task description…" onkeydown="if(event.key==='Enter')addTask()">
+          <select class="inp" id="tp"><option>High</option><option selected>Medium</option><option>Low</option></select>
+          <input class="inp" id="td" type="date" value="${T()}">
+          <button class="pbtn" onclick="addTask()">Add</button>
+        </div>
+      </div>
+      <div id="task-list">
+        ${shown.map(t=>{const[tc,bg]=pc[t.priority]||['#888','#eee'];return`<div class="row-it${t.done?' done':''}">
+          <input type="checkbox" ${t.done?'checked':''} onchange="toggleTask('${t.id}')" style="width:16px;height:16px;accent-color:var(--blue);cursor:pointer;flex-shrink:0">
+          <div class="ri-m"><div class="ri-t" style="${t.done?'text-decoration:line-through;color:var(--muted)':''}">${t.text}</div><div class="ri-s">Due: ${fD(t.due)} · Added by ${t.by}</div></div>
+          ${bdg(t.priority,tc,bg)}
+          <button class="rbtn" onclick="removeTask('${t.id}')">✕</button>
+        </div>`;}).join('')}
+      </div>
+    </div>
+    <div class="right">
+      ${pieCard(pieD,'Priority breakdown')}
+      <div class="card">
+        <div class="card-title">📊 Quick stats</div>
+        <div style="font-size:12.5px;color:var(--muted);line-height:2">
+          ✅ Completed: <b style="color:var(--navy)">${done}</b><br>
+          ⏳ Pending: <b style="color:var(--bad)">${tasks.length-done}</b><br>
+          🔴 High priority: <b style="color:var(--bad)">${tasks.filter(t=>t.priority==='High'&&!t.done).length}</b><br>
+          👤 Assigned to me: <b style="color:var(--blue)">${tasks.filter(t=>t.aTo===CU.id).length}</b>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+function addTask(){const t=document.getElementById('tt').value.trim();if(!t)return;D.tasks.push({id:uid(),text:t,done:false,priority:document.getElementById('tp').value,due:document.getElementById('td').value||T(),aTo:CU.id,by:CU.name.split(' ')[0]});nav('todo');}
+function toggleTask(id){D.tasks=D.tasks.map(x=>x.id===id?{...x,done:!x.done}:x);nav('todo');}
+function removeTask(id){D.tasks=D.tasks.filter(x=>x.id!==id);nav('todo');}
+
+// ═══════════════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════════════
+function renderCalendar(){
+  const strip=Array.from({length:14},(_,i)=>aD(T(),i-1));
+  const tc={Event:'#2563a8',Chore:'#1a7a4a',Birthday:'#c0392b',Medical:'#6d28d9',Bill:'#c47d10',Other:'#6b8aa8'};
+  const upcoming=D.bills.filter(b=>!b.paid&&b.due>=T()).sort((a,b)=>a.due>b.due?1:-1).slice(0,3);
+  const maintDue=D.maint.filter(m=>m.next<=aD(T(),14)).slice(0,3);
+  const pieD=['Event','Medical','Chore','Birthday','Other'].map((t,i)=>({l:t,v:D.events.filter(e=>e.type===t).length,c:CLRS[i]}));
+  return`
+  <div class="two-col">
+    <div class="left">
+      <div class="card">
+        <div class="card-title">📅 2-Week View</div>
+        <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:4px">
+          ${strip.map(d=>{
+            const ev=D.events.filter(e=>e.date===d);
+            const isTd=d===T();
+            return`<div style="text-align:center;padding:8px 7px;border-radius:9px;min-width:50px;flex-shrink:0;background:${isTd?'var(--blue)':'var(--sky)'};color:${isTd?'#fff':'var(--navy)'};border:1px solid var(--border)">
+              <div style="font-size:9px;opacity:.8">${new Date(d+'T00:00').toLocaleDateString('en-US',{weekday:'short'})}</div>
+              <div style="font-size:16px;font-weight:700">${new Date(d+'T00:00').getDate()}</div>
+              ${ev.length?`<div style="width:6px;height:6px;border-radius:50%;background:${isTd?'#fff':'var(--blue)'};margin:2px auto 0"></div>`:`<div style="height:8px"></div>`}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">＋ Add Event</div>
+        <div class="g2">
+          <div><span class="fl">Title</span><input class="inp" id="ev-t" placeholder="Event name…"></div>
+          <div><span class="fl">Type</span><select class="inp" id="ev-ty"><option>Event</option><option>Chore</option><option>Birthday</option><option>Medical</option><option>Bill</option><option>Other</option></select></div>
+          <div><span class="fl">Date</span><input class="inp" id="ev-d" type="date" value="${T()}"></div>
+          <div><span class="fl">Time</span><input class="inp" id="ev-ti" type="time" value="10:00"></div>
+        </div>
+        <input class="inp" id="ev-n" placeholder="Notes (optional)…" style="margin-bottom:10px">
+        <button class="pbtn" onclick="addEvent()">Add Event</button>
+      </div>
+      <div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:10px">All Events</div>
+      ${D.events.slice().sort((a,b)=>a.date>b.date?1:-1).map(e=>`<div class="row-it">
+        <div style="width:4px;height:40px;border-radius:3px;background:${tc[e.type]||'#888'};flex-shrink:0"></div>
+        <div class="ri-m"><div class="ri-t">${e.title}</div><div class="ri-s">${fD(e.date)} at ${e.time} · ${e.type} · ${e.by}</div></div>
+        ${bdg(e.type,tc[e.type]||'#888','var(--sky)')}
+        <button class="rbtn" onclick="removeEvent('${e.id}')">✕</button>
+      </div>`).join('')}
+    </div>
+    <div class="right">
+      <div class="card" style="background:#fffbe6;border:1.5px solid #f0c050">
+        <div class="card-title">⚠️ Upcoming reminders</div>
+        ${upcoming.map(b=>`<div style="padding:6px 0;border-bottom:1px solid #f0e080;font-size:12px"><b>${b.type}</b> bill due<br><span style="color:var(--muted)">${fD(b.due)} · NPR ${b.amount}</span></div>`).join('')}
+        ${maintDue.map(m=>`<div style="padding:6px 0;font-size:12px"><b>${m.name}</b> maintenance<br><span style="color:var(--muted)">Due: ${fD(m.next)}</span></div>`).join('')}
+        ${!upcoming.length&&!maintDue.length?'<div style="font-size:12px;color:var(--muted)">All clear! No upcoming reminders.</div>':''}
+      </div>
+      ${pieCard(pieD,'Events by type')}
+    </div>
+  </div>`;
+}
+function addEvent(){const t=document.getElementById('ev-t').value.trim();if(!t)return;D.events.push({id:uid(),title:t,date:document.getElementById('ev-d').value||T(),time:document.getElementById('ev-ti').value,type:document.getElementById('ev-ty').value,notes:document.getElementById('ev-n').value,by:CU.name.split(' ')[0]});nav('calendar');}
+function removeEvent(id){D.events=D.events.filter(x=>x.id!==id);nav('calendar');}
+
+// ═══════════════════════════════════════════════
+// CHORES
+// ═══════════════════════════════════════════════
+function renderChores(){
+  const fam=famUsers();
+  const byM={};D.chores.forEach(c=>{byM[c.aTo]=(byM[c.aTo]||[]).concat(c);});
+  const pieD=fam.map((u,i)=>({l:u.name.split(' ')[0],v:(byM[u.id]||[]).length,c:CLRS[i]}));
+  const fc={Daily:'#2563a8',Weekly:'#1a7a4a','Bi-weekly':'#c47d10',Monthly:'#6d28d9'};
+  return`
+  <div class="two-col">
+    <div class="left">
+      <div class="grid-stats" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-box"><div class="stat-n">${D.chores.length}</div><div class="stat-l">Total</div></div>
+        <div class="stat-box"><div class="stat-n" style="color:var(--ok)">${D.chores.filter(c=>c.done).length}</div><div class="stat-l">Done</div></div>
+        <div class="stat-box"><div class="stat-n" style="color:var(--bad)">${D.chores.filter(c=>!c.done).length}</div><div class="stat-l">Pending</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">＋ Add Chore</div>
+        <div class="g2">
+          <div><span class="fl">Chore Name</span><input class="inp" id="ch-n" placeholder="Clean kitchen…"></div>
+          <div><span class="fl">Frequency</span><select class="inp" id="ch-f"><option>Daily</option><option>Weekly</option><option>Bi-weekly</option><option>Monthly</option></select></div>
+          <div><span class="fl">Assign To</span><select class="inp" id="ch-w">${fam.map(u=>`<option value="${u.id}">${u.name}</option>`).join('')}</select></div>
+          <div><span class="fl">Day / Schedule</span><input class="inp" id="ch-d" placeholder="e.g. Saturday"></div>
+        </div>
+        <button class="pbtn" onclick="addChore()">Add Chore</button>
+      </div>
+      ${fam.map(u=>{
+        const uc=D.chores.filter(c=>c.aTo===u.id);
+        if(!uc.length)return'';
+        return`<div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:9px;margin-top:4px">👤 ${u.name}</div>
+        ${uc.map(c=>`<div class="row-it${c.done?' done':''}">
+          <input type="checkbox" ${c.done?'checked':''} onchange="toggleChore('${c.id}')" style="width:16px;height:16px;accent-color:var(--blue);cursor:pointer;flex-shrink:0">
+          <div class="ri-m"><div class="ri-t" style="${c.done?'text-decoration:line-through;color:var(--muted)':''}">${c.name}</div><div class="ri-s">${c.freq} · ${c.day}${c.done&&c.doneBy?' · Done by '+c.doneBy:''}</div></div>
+          ${bdg(c.freq,fc[c.freq]||'#888','var(--sky)')}
+          <button class="rbtn" onclick="removeChore('${c.id}')">✕</button>
+        </div>`).join('')}`;
+      }).join('')}
+    </div>
+    <div class="right">${pieCard(pieD,'Chores by family member')}</div>
+  </div>`;
+}
+function addChore(){const n=document.getElementById('ch-n').value.trim();if(!n)return;D.chores.push({id:uid(),name:n,freq:document.getElementById('ch-f').value,aTo:document.getElementById('ch-w').value,day:document.getElementById('ch-d').value||'—',done:false,doneBy:null});nav('chores');}
+function toggleChore(id){D.chores=D.chores.map(x=>x.id===id?{...x,done:!x.done,doneBy:!x.done?CU.name.split(' ')[0]:null}:x);nav('chores');}
+function removeChore(id){D.chores=D.chores.filter(x=>x.id!==id);nav('chores');}
+
+// ═══════════════════════════════════════════════
+// CONTACTS
+// ═══════════════════════════════════════════════
+function renderContacts(){
+  const cats=['Medical','Service','Emergency','Landlord','Neighbor','Other'];
+  const cc={Medical:'#6d28d9',Service:'#2563a8',Emergency:'#c0392b',Landlord:'#c47d10',Neighbor:'#1a7a4a',Other:'#6b8aa8'};
+  const pieD=cats.map((c,i)=>({l:c,v:D.contacts.filter(x=>x.cat===c).length,c:cc[c]||CLRS[i]}));
+  return`
+  <div class="two-col">
+    <div class="left">
+      <div class="card">
+        <div class="card-title">＋ Add Contact</div>
+        <div class="g2">
+          <div><span class="fl">Name</span><input class="inp" id="co-n" placeholder="Dr. Sharma…"></div>
+          <div><span class="fl">Phone</span><input class="inp" id="co-p" placeholder="+977-9841234567"></div>
+          <div><span class="fl">Category</span><select class="inp" id="co-c">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
+          <div><span class="fl">Notes</span><input class="inp" id="co-no" placeholder="Notes…"></div>
+        </div>
+        <button class="pbtn" onclick="addContact()">Add Contact</button>
+      </div>
+      ${cats.map(cat=>{
+        const cs=D.contacts.filter(c=>c.cat===cat);
+        if(!cs.length)return'';
+        return`<div style="font-weight:700;color:${cc[cat]};font-size:13px;margin-bottom:9px;margin-top:2px">${cat}</div>
+        ${cs.map(c=>`<div class="row-it">
+          <div style="width:38px;height:38px;border-radius:50%;background:${cc[c.cat]||'#888'};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">${c.name.slice(0,2).toUpperCase()}</div>
+          <div class="ri-m"><div class="ri-t">${c.name}</div><div class="ri-s">${c.phone}${c.notes?' · '+c.notes:''}</div></div>
+          ${bdg(c.cat,cc[c.cat]||'#888','var(--sky)')}
+          <button class="rbtn" onclick="removeContact('${c.id}')">✕</button>
+        </div>`).join('')}`;
+      }).join('')}
+    </div>
+    <div class="right">${pieCard(pieD,'Contacts by type')}</div>
+  </div>`;
+}
+function addContact(){const n=document.getElementById('co-n').value.trim(),p=document.getElementById('co-p').value.trim();if(!n||!p)return;D.contacts.push({id:uid(),name:n,phone:p,cat:document.getElementById('co-c').value,notes:document.getElementById('co-no').value});nav('contacts');}
+function removeContact(id){D.contacts=D.contacts.filter(x=>x.id!==id);nav('contacts');}
+
+// ═══════════════════════════════════════════════
+// GROCERY
+// ═══════════════════════════════════════════════
+function renderGrocery(){
+  const months=[...new Set(D.grocery.map(i=>mk(i.date)))].filter(Boolean).sort().reverse();
+  const allM=months.length?months:[mk(T())];
+  if(!allM.includes(gMonth))gMonth=allM[0];
+  const items=D.grocery.filter(i=>mk(i.date)===gMonth);
+  const total=items.reduce((s,i)=>s+i.price*i.qty,0);
+  const catT={};items.forEach(i=>{catT[i.cat]=(catT[i.cat]||0)+i.price*i.qty;});
+  const pieD=Object.entries(catT).map(([k,v],i)=>({l:k,v,c:CLRS[i%CLRS.length]}));
+  const maxM=Math.max(...allM.map(m=>D.grocery.filter(i=>mk(i.date)===m).reduce((s,i)=>s+i.price*i.qty,0)),1);
+  return`
+  <div class="two-col">
+    <div class="left">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+        <select class="inp" style="width:auto" onchange="gMonth=this.value;nav('grocery')">${allM.map(m=>`<option value="${m}"${m===gMonth?' selected':''}>${fM(m)}</option>`).join('')}</select>
+        <div style="background:var(--blue);color:#fff;border-radius:10px;padding:7px 18px;font-weight:700;font-size:13px">Total: NPR ${total.toLocaleString()}</div>
+      </div>
+      <div class="card">
+        <div class="card-title">＋ Add Item</div>
+        <div class="g2">
+          <input class="inp" id="gi-n" placeholder="Item name…">
+          <input class="inp" id="gi-p" type="number" placeholder="Price (NPR)">
+          <input class="inp" id="gi-q" type="number" value="1" placeholder="Qty">
+          <select class="inp" id="gi-c"><option>Staples</option><option>Dairy</option><option>Vegetables</option><option>Fruits</option><option>Meat</option><option>Bakery</option><option>Snacks</option><option>Other</option></select>
+          <input class="inp" id="gi-d" type="date" value="${T()}">
+        </div>
+        <button class="pbtn" onclick="addGrocery()">Add Item</button>
+      </div>
+      ${items.slice().reverse().map(i=>`<div class="row-it">
+        <div class="ri-m"><div class="ri-t">${i.name}</div><div class="ri-s">${fD(i.date)} · ${i.cat} · Qty: ${i.qty}</div></div>
+        <div style="font-weight:700;color:var(--blue);font-size:13px;flex-shrink:0">NPR ${(i.price*i.qty).toLocaleString()}</div>
+        <button class="rbtn" onclick="removeGrocery('${i.id}')">✕</button>
+      </div>`).join('')}
+    </div>
+    <div class="right">
+      ${pieCard(pieD,'Spending by category')}
+      <div class="card"><div class="card-title">Monthly trend</div>${allM.map((m,i)=>{const v=D.grocery.filter(x=>mk(x.date)===m).reduce((s,x)=>s+x.price*x.qty,0);return mbar(new Date(m+'-01').toLocaleDateString('en-US',{month:'short',year:'2-digit'}),v,maxM,CLRS[i%CLRS.length]);}).join('')}</div>
+    </div>
+  </div>`;
+}
+function addGrocery(){const n=document.getElementById('gi-n').value.trim(),p=parseFloat(document.getElementById('gi-p').value);if(!n||!p)return;D.grocery.push({id:uid(),name:n,price:p,qty:parseInt(document.getElementById('gi-q').value)||1,date:document.getElementById('gi-d').value||T(),cat:document.getElementById('gi-c').value});nav('grocery');}
+function removeGrocery(id){D.grocery=D.grocery.filter(x=>x.id!==id);nav('grocery');}
+
+// ═══════════════════════════════════════════════
+// BILLS
+// ═══════════════════════════════════════════════
+function renderBills(){
+  const pending=D.bills.filter(b=>!b.paid),paid=D.bills.filter(b=>b.paid);
+  const tT={};D.bills.forEach(b=>{tT[b.type]=(tT[b.type]||0)+b.amount;});
+  const pieD=Object.entries(tT).map(([k,v],i)=>({l:k,v,c:CLRS[i]}));
+  const btc={Electricity:['#c47d10','#fef3e2'],'Waste Management':['#1a7a4a','#e2f5eb'],Internet:['#2563a8','#e6f0fb'],Water:['#0891b2','#e0f7fa'],Other:['#6b8aa8','var(--sky)']};
+  return`
+  <div class="two-col">
+    <div class="left">
+      <div class="grid-stats">
+        <div class="stat-box"><div class="stat-n" style="color:var(--bad)">${pending.length}</div><div class="stat-l">Pending</div></div>
+        <div class="stat-box"><div class="stat-n" style="color:var(--ok)">${paid.length}</div><div class="stat-l">Paid</div></div>
+        <div class="stat-box"><div class="stat-n" style="font-size:17px;color:var(--warn)">NPR ${pending.reduce((s,b)=>s+b.amount,0).toLocaleString()}</div><div class="stat-l">Total Owed</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">＋ Add Bill</div>
+        <div class="g2">
+          <select class="inp" id="bi-t"><option>Electricity</option><option>Waste Management</option><option>Internet</option><option>Water</option><option>Other</option></select>
+          <input class="inp" id="bi-a" type="number" placeholder="Amount (NPR)">
+          <div><span class="fl">Due Date</span><input class="inp" id="bi-d" type="date" value="${T()}"></div>
+          <input class="inp" id="bi-p" placeholder="Period (e.g. May 2026)">
+        </div>
+        <button class="pbtn" onclick="addBill()">Add Bill</button>
+      </div>
+      ${pending.length?`<div style="font-weight:700;color:var(--bad);font-size:13px;margin-bottom:10px">⚠️ Pending Bills</div>
+      ${pending.map(b=>{const ov=b.due<T();const[tc,bg]=btc[b.type]||['#888','var(--sky)'];return`<div class="row-it${ov?' ov':''}">
+        <div class="ri-m"><div class="ri-t" style="${ov?'color:var(--bad)':''}">${b.type}${b.period?' — '+b.period:''}${ov?' ⚠️ OVERDUE':''}</div><div class="ri-s">Due: ${fD(b.due)}</div></div>
+        <div style="font-weight:700;color:var(--navy);font-size:13px;flex-shrink:0">NPR ${b.amount.toLocaleString()}</div>
+        ${bdg(b.type.split(' ')[0],tc,bg)}
+        <button class="gbtn" onclick="markBillPaid('${b.id}')">Paid ✓</button>
+        <button class="rbtn" onclick="removeBill('${b.id}')">✕</button>
+      </div>`;}).join('')}`:''}
+      ${paid.length?`<div style="font-weight:700;color:var(--ok);font-size:13px;margin:12px 0 10px">✅ Paid Bills</div>
+      ${paid.slice().reverse().map(b=>`<div class="row-it done">
+        <div class="ri-m"><div class="ri-t">${b.type}${b.period?' — '+b.period:''}</div><div class="ri-s">Paid on: ${fD(b.paid)}</div></div>
+        <div style="font-weight:700;color:var(--muted);font-size:13px;flex-shrink:0">NPR ${b.amount.toLocaleString()}</div>
+        <button class="rbtn" onclick="removeBill('${b.id}')">✕</button>
+      </div>`).join('')}`:''}
+    </div>
+    <div class="right">${pieCard(pieD,'Bills by type')}</div>
+  </div>`;
+}
+function addBill(){const a=parseFloat(document.getElementById('bi-a').value);if(!a)return;D.bills.push({id:uid(),type:document.getElementById('bi-t').value,amount:a,due:document.getElementById('bi-d').value||T(),paid:null,period:document.getElementById('bi-p').value});nav('bills');}
+function markBillPaid(id){D.bills=D.bills.map(x=>x.id===id?{...x,paid:T()}:x);nav('bills');}
+function removeBill(id){D.bills=D.bills.filter(x=>x.id!==id);nav('bills');}
+
+// ═══════════════════════════════════════════════
+// GAS
+// ═══════════════════════════════════════════════
+function renderGas(){
+  const done=D.gas.filter(r=>r.end);
+  const avg=done.length?Math.round(done.reduce((s,r)=>(s+(new Date(r.end)-new Date(r.start))/86400000),0)/done.length):30;
+  const active=D.gas.find(r=>!r.end);
+  const mM={};done.forEach(r=>{const m=mk(r.end);mM[m]=(mM[m]||0)+r.cost;});
+  const mK=Object.keys(mM).sort();
+  const maxC=Math.max(...mK.map(k=>mM[k]),1);
+  return`
+  ${active?`<div class="info-box"><div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:5px">🔵 Cylinder Active</div>
+  <div style="font-size:12.5px;color:var(--muted)">Started: ${fD(active.start)} &nbsp;·&nbsp; Est. empty: <b style="color:var(--bad)">${fD(aD(active.start,avg))}</b> &nbsp;(~${avg} day average)</div>
+  <button class="gbtn" style="margin-top:10px" onclick="markGasDone('${active.id}')">Mark Cylinder Empty</button></div>`:''}
+  <div class="two-col">
+    <div class="left">
+      <div class="card">
+        <div class="card-title">＋ Add Gas Record</div>
+        <div class="g2">
+          <div><span class="fl">Start Date</span><input class="inp" id="gs-s" type="date" value="${T()}"></div>
+          <div><span class="fl">End Date (leave blank if active)</span><input class="inp" id="gs-e" type="date"></div>
+          <div><span class="fl">Weight (kg)</span><input class="inp" id="gs-k" type="number" value="14.2"></div>
+          <div><span class="fl">Cost (NPR)</span><input class="inp" id="gs-c" type="number" value="2200"></div>
+        </div>
+        <button class="pbtn" onclick="addGas()">Add Record</button>
+      </div>
+      ${D.gas.slice().reverse().map(r=>`<div class="row-it"><span style="font-size:20px">${r.end?'✅':'🔵'}</span>
+        <div class="ri-m"><div class="ri-t">${r.kg}kg — NPR ${r.cost.toLocaleString()}</div><div class="ri-s">${fD(r.start)} ${r.end?'→ '+fD(r.end):'→ Currently in use'}</div></div>
+        ${!r.end?`<button class="gbtn" onclick="markGasDone('${r.id}')">Empty</button>`:''}
+        <button class="rbtn" onclick="removeGas('${r.id}')">✕</button>
+      </div>`).join('')}
+    </div>
+    <div class="right">
+      <div class="card"><div class="card-title">Monthly gas cost</div>${mK.length?mK.map((m,i)=>mbar(new Date(m+'-01').toLocaleDateString('en-US',{month:'short',year:'2-digit'}),mM[m],maxC,CLRS[i%CLRS.length])).join(''):'<div style="font-size:12px;color:var(--muted)">No completed records yet.</div>'}</div>
+    </div>
+  </div>`;
+}
+function addGas(){const s=document.getElementById('gs-s').value;if(!s)return;D.gas.push({id:uid(),start:s,end:document.getElementById('gs-e').value||null,kg:parseFloat(document.getElementById('gs-k').value)||14.2,cost:parseFloat(document.getElementById('gs-c').value)||0});nav('gas');}
+function markGasDone(id){D.gas=D.gas.map(x=>x.id===id?{...x,end:T()}:x);nav('gas');}
+function removeGas(id){D.gas=D.gas.filter(x=>x.id!==id);nav('gas');}
+
+// ═══════════════════════════════════════════════
+// BUDGET
+// ═══════════════════════════════════════════════
+function renderBudget(){
+  const months=[...new Set([...D.grocery.map(i=>mk(i.date)),...D.bills.filter(b=>b.paid).map(b=>mk(b.paid)),...D.gas.filter(r=>r.end).map(r=>mk(r.end))])].filter(Boolean).sort().reverse();
+  const allM=months.length?months:[mk(T())];
+  if(!allM.includes(bMonth))bMonth=allM[0];
+  const selM=bMonth;
+  const spend={
+    Grocery:D.grocery.filter(i=>mk(i.date)===selM).reduce((s,i)=>s+i.price*i.qty,0),
+    Bills:D.bills.filter(b=>b.paid&&mk(b.paid)===selM).reduce((s,b)=>s+b.amount,0),
+    Gas:D.gas.filter(r=>r.end&&mk(r.end)===selM).reduce((s,r)=>s+r.cost,0),
+    Other:0,
+  };
+  const total=Object.values(spend).reduce((a,b)=>a+b,0);
+  const pieD=[{l:'Grocery',v:spend.Grocery,c:'#1a7a4a'},{l:'Bills',v:spend.Bills,c:'#c47d10'},{l:'Gas',v:spend.Gas,c:'#2563a8'}].filter(d=>d.v>0);
+  return`
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap">
+    <select class="inp" style="width:auto" onchange="bMonth=this.value;nav('budget')">${allM.map(m=>`<option value="${m}"${m===selM?' selected':''}>${fM(m)}</option>`).join('')}</select>
+    <div style="background:var(--blue);color:#fff;border-radius:10px;padding:7px 18px;font-weight:700;font-size:13px">Total Spent: NPR ${total.toLocaleString()}</div>
+  </div>
+  <div class="two-col">
+    <div class="left">
+      ${['Grocery','Bills','Gas','Other'].map(cat=>{
+        const b=D.budgets.find(x=>x.cat===cat&&x.month===selM);
+        const sp=spend[cat]||0;
+        const pct=b?Math.min(100,Math.round(sp/b.limit*100)):0;
+        const over=b&&sp>b.limit;
+        return`<div class="card" style="${over?'border:1.5px solid #f0a0a0;background:#fff8f8':''}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-weight:700;color:var(--navy);font-size:13px">${cat}</div>
+            ${b?`<div style="font-size:12px;font-weight:700;color:${over?'var(--bad)':'var(--ok)'}">NPR ${sp.toLocaleString()} / ${b.limit.toLocaleString()}${over?' ⚠️ Over!':''}</div>`:
+            `<div style="font-size:11px;color:var(--muted)">No budget set</div>`}
+          </div>
+          ${b?`${prog(pct,over?'#c0392b':pct>80?'#c47d10':'#1a7a4a')}<div style="font-size:10px;color:var(--muted);margin-top:3px">${pct}% of budget used</div>`:''}
+          ${!b?`<div style="font-size:12px;color:var(--muted)">Set a monthly limit for ${cat} using the form below.</div>`:''}
+        </div>`;
+      }).join('')}
+      <div class="card">
+        <div class="card-title">Set Budget Limit for ${fM(selM)}</div>
+        <div class="g3">
+          <div><span class="fl">Category</span><select class="inp" id="bg-c"><option>Grocery</option><option>Bills</option><option>Gas</option><option>Other</option></select></div>
+          <div><span class="fl">Monthly Limit (NPR)</span><input class="inp" id="bg-l" type="number" placeholder="5000"></div>
+          <div style="display:flex;align-items:flex-end"><button class="pbtn" onclick="setBudget()">Set</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      ${pieCard(pieD,'Spending breakdown')}
+      <div class="card"><div class="card-title">vs. budget</div>
+        ${['Grocery','Bills','Gas'].map(c=>{const b=D.budgets.find(x=>x.cat===c&&x.month===selM);const sp=spend[c]||0;if(!b)return`<div style="font-size:11px;color:var(--muted);margin-bottom:8px">${c}: no budget set</div>`;return mbar(c,sp,b.limit,sp>b.limit?'#c0392b':'#1a7a4a');}).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+function setBudget(){const c=document.getElementById('bg-c').value,l=parseFloat(document.getElementById('bg-l').value);if(!l)return;const ei=D.budgets.findIndex(x=>x.cat===c&&x.month===bMonth);if(ei>=0)D.budgets[ei].limit=l;else D.budgets.push({id:uid(),cat:c,month:bMonth,limit:l});nav('budget');}
+
+// ═══════════════════════════════════════════════
+// MONTHLY REPORT
+// ═══════════════════════════════════════════════
+function renderReport(){
+  const months=[...new Set([...D.grocery.map(i=>mk(i.date)),...D.bills.filter(b=>b.paid).map(b=>mk(b.paid)),...D.gas.filter(r=>r.end).map(r=>mk(r.end))])].filter(Boolean).sort().reverse();
+  const allM=months.length?months:[mk(T())];
+  if(!allM.includes(rMonth))rMonth=allM[0];
+  const sel=rMonth;
+  const gr=D.grocery.filter(i=>mk(i.date)===sel).reduce((s,i)=>s+i.price*i.qty,0);
+  const bi=D.bills.filter(b=>b.paid&&mk(b.paid)===sel).reduce((s,b)=>s+b.amount,0);
+  const ga=D.gas.filter(r=>r.end&&mk(r.end)===sel).reduce((s,r)=>s+r.cost,0);
+  const tot=gr+bi+ga;
+  const pieD=[{l:'Grocery',v:gr,c:'#1a7a4a'},{l:'Bills',v:bi,c:'#c47d10'},{l:'Gas',v:ga,c:'#2563a8'}].filter(d=>d.v>0);
+  const maxB=Math.max(gr,bi,ga,1);
+  return`
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:18px">
+    <select class="inp" style="width:auto" onchange="rMonth=this.value;nav('report')">${allM.map(m=>`<option value="${m}"${m===sel?' selected':''}>${fM(m)}</option>`).join('')}</select>
+  </div>
+  <div class="grid-stats" style="grid-template-columns:repeat(4,1fr)">
+    ${[['🛒 Grocery',gr,'#1a7a4a'],['💡 Bills',bi,'#c47d10'],['⛽ Gas',ga,'#2563a8'],['📦 Total',tot,'var(--navy)']].map(([l,v,c])=>`<div class="stat-box"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">${l}</div><div style="font-size:18px;font-weight:700;color:${c}">NPR ${v.toLocaleString()}</div></div>`).join('')}
+  </div>
+  <div class="card" style="text-align:center;background:linear-gradient(135deg,#e6f0fb,#d0e8f8);border:1.5px solid #7bb8e8;margin-bottom:18px">
+    <div style="font-size:13px;color:var(--muted)">Total household expenses — ${fM(sel)}</div>
+    <div style="font-size:32px;font-weight:700;color:var(--navy);margin:8px 0">NPR ${tot.toLocaleString()}</div>
+  </div>
+  <div class="two-col">
+    <div class="left">${pieCard(pieD,'Spending breakdown')}</div>
+    <div class="right"><div class="card"><div class="card-title">Category comparison</div>${mbar('Grocery',gr,maxB,'#1a7a4a')}${mbar('Bills',bi,maxB,'#c47d10')}${mbar('Gas',ga,maxB,'#2563a8')}</div></div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// SAVINGS
+// ═══════════════════════════════════════════════
+function renderSavings(){
+  const pieD=D.savings.map((g,i)=>({l:g.name,v:g.target,c:CLRS[i%CLRS.length]}));
+  return`
+  <div class="two-col">
+    <div class="left">
+      ${D.savings.map((g,i)=>{
+        const pct=Math.min(100,Math.round(g.saved/g.target*100));
+        const done=g.saved>=g.target;
+        const dl=g.deadline?Math.ceil((new Date(g.deadline)-new Date(T()))/86400000):null;
+        return`<div class="card" style="${done?'border:1.5px solid #1a7a4a':''}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px">
+            <div style="flex:1"><div style="font-weight:700;color:var(--navy);font-size:14px">${done?'🎉 ':''}${g.name}</div>
+            <div style="font-size:11px;color:var(--muted)">${g.cat}${g.deadline?' · Due: '+fD(g.deadline):''}</div></div>
+            <div style="text-align:right;flex-shrink:0"><div style="font-weight:700;color:var(--blue);font-size:13px">NPR ${g.saved.toLocaleString()} / ${g.target.toLocaleString()}</div><div style="font-size:11px;color:${pct>=100?'var(--ok)':'var(--muted)'}">${pct}% saved</div></div>
+            <button class="rbtn" onclick="removeSaving('${g.id}')">✕</button>
+          </div>
+          ${prog(pct,done?'#1a7a4a':CLRS[i%CLRS.length],10)}
+          ${dl!==null?`<div style="font-size:10px;color:var(--muted);margin-top:4px">${dl>0?dl+' days left':dl===0?'Due today!':'Deadline passed'}</div>`:''}
+        </div>`;
+      }).join('')}
+      <div class="card">
+        <div class="card-title">＋ Create New Goal</div>
+        <div class="g2">
+          <div><span class="fl">Goal Name</span><input class="inp" id="sv-n" placeholder="Festival fund…"></div>
+          <div><span class="fl">Category</span><select class="inp" id="sv-c"><option>Festival</option><option>Appliance</option><option>Travel</option><option>Education</option><option>Emergency</option><option>Other</option></select></div>
+          <div><span class="fl">Target (NPR)</span><input class="inp" id="sv-t" type="number" placeholder="50000"></div>
+          <div><span class="fl">Already Saved (NPR)</span><input class="inp" id="sv-s" type="number" placeholder="0"></div>
+          <div><span class="fl">Deadline (optional)</span><input class="inp" id="sv-d" type="date"></div>
+          <div><span class="fl">Notes</span><input class="inp" id="sv-no" placeholder="Notes…"></div>
+        </div>
+        <button class="pbtn" onclick="addSaving()">Create Goal</button>
+      </div>
+      ${D.savings.length?`<div class="card"><div class="card-title">Add Contribution</div><div class="g3">
+        <div><span class="fl">Goal</span><select class="inp" id="sv-gid"><option value="">Select goal…</option>${D.savings.map(g=>`<option value="${g.id}">${g.name}</option>`).join('')}</select></div>
+        <div><span class="fl">Amount (NPR)</span><input class="inp" id="sv-a" type="number" placeholder="500"></div>
+        <div style="display:flex;align-items:flex-end"><button class="pbtn" onclick="addContrib()">Contribute</button></div>
+      </div></div>`:''}
+    </div>
+    <div class="right">${D.savings.length?pieCard(pieD,'Goals by target amount'):''}</div>
+  </div>`;
+}
+function addSaving(){const n=document.getElementById('sv-n').value.trim(),t=parseFloat(document.getElementById('sv-t').value);if(!n||!t)return;D.savings.push({id:uid(),name:n,target:t,saved:parseFloat(document.getElementById('sv-s').value)||0,deadline:document.getElementById('sv-d').value,cat:document.getElementById('sv-c').value,notes:document.getElementById('sv-no').value});nav('savings');}
+function removeSaving(id){D.savings=D.savings.filter(x=>x.id!==id);nav('savings');}
+function addContrib(){const gid=document.getElementById('sv-gid').value,a=parseFloat(document.getElementById('sv-a').value);if(!gid||!a)return;D.savings=D.savings.map(x=>x.id===gid?{...x,saved:x.saved+a}:x);nav('savings');}
+
+// ═══════════════════════════════════════════════
+// WATER
+// ═══════════════════════════════════════════════
+function renderWater(){
+  const last=D.water.slice().sort((a,b)=>a.date>b.date?-1:1)[0];
+  const lvlN={'Full':100,'75%':75,'50%':50,'25%':25,'Low':10,'Empty':0};
+  const curP=last?lvlN[last.level]??50:100;
+  const avgL=D.water.filter(l=>l.liters).length?Math.round(D.water.filter(l=>l.liters).reduce((s,l)=>s+l.liters,0)/D.water.filter(l=>l.liters).length):0;
+  const dL=avgL>0?Math.round(D.tankSize*curP/100/avgL):null;
+  const pieD=[{l:'Used',v:100-curP,c:'#2563a8'},{l:'Remaining',v:curP,c:'#b8d4f0'}].filter(d=>d.v>0);
+  return`
+  ${last&&last.level==='Low'?`<div class="warn-box"><b>⚠️ Tank level is LOW!</b> Arrange water refill soon.</div>`:''}
+  <div class="two-col">
+    <div class="left">
+      <div style="display:flex;gap:16px;align-items:center;margin-bottom:18px;flex-wrap:wrap">
+        <div style="text-align:center">${svgPie(pieD,130)}<div style="font-size:13px;font-weight:700;color:var(--navy);margin-top:5px">${curP}% Full</div></div>
+        <div class="card" style="flex:1;margin:0">
+          <div class="card-title">Tank status</div>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px"><span class="fl" style="margin:0">Tank size:</span><input class="inp" id="wt-sz" type="number" value="${D.tankSize}" style="width:90px" oninput="D.tankSize=parseInt(this.value)||1000"><span style="font-size:12px;color:var(--muted)">liters</span></div>
+          ${dL!==null?`<div style="font-size:13px;color:var(--navy)">Est. <b style="color:${dL<3?'var(--bad)':'var(--ok)'}">${dL} days</b> of water remaining</div>`:'<div style="font-size:12px;color:var(--muted)">Log liters used to see estimate</div>'}
+          ${avgL?`<div style="font-size:11px;color:var(--muted);margin-top:4px">Avg daily usage: ${avgL}L</div>`:''}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Log Water Level</div>
+        <div class="g2">
+          <div><span class="fl">Date</span><input class="inp" id="wt-d" type="date" value="${T()}"></div>
+          <div><span class="fl">Tank Level</span><select class="inp" id="wt-l"><option>Full</option><option>75%</option><option>50%</option><option>25%</option><option>Low</option><option>Empty</option></select></div>
+          <div><span class="fl">Liters Used</span><input class="inp" id="wt-li" type="number" placeholder="50"></div>
+          <div><span class="fl">Refill Cost (NPR)</span><input class="inp" id="wt-c" type="number" placeholder="0"></div>
+        </div>
+        <input class="inp" id="wt-n" placeholder="Notes…" style="margin-bottom:10px">
+        <button class="pbtn" onclick="addWater()">Log Level</button>
+      </div>
+      ${D.water.slice().sort((a,b)=>a.date>b.date?-1:1).map(l=>`<div class="row-it"><span style="font-size:20px">💧</span>
+        <div class="ri-m"><div class="ri-t">${fD(l.date)} — ${l.level}</div><div class="ri-s">${l.liters?l.liters+'L used · ':''}${l.cost?'NPR '+l.cost+' refill · ':''}${l.by}</div></div>
+        ${bdg(l.level,'#2563a8','#e6f0fb')}
+        <button class="rbtn" onclick="removeWater('${l.id}')">✕</button>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+function addWater(){D.water.push({id:uid(),date:document.getElementById('wt-d').value||T(),level:document.getElementById('wt-l').value,liters:parseFloat(document.getElementById('wt-li').value)||0,cost:parseFloat(document.getElementById('wt-c').value)||0,notes:document.getElementById('wt-n').value,by:CU.name.split(' ')[0]});nav('water');}
+function removeWater(id){D.water=D.water.filter(x=>x.id!==id);nav('water');}
+
+// ═══════════════════════════════════════════════
+// WASHING MACHINE
+// ═══════════════════════════════════════════════
+function renderWashing(){
+  const cycle=30;
+  const last=D.wash.slice().sort((a,b)=>a.date>b.date?-1:1)[0];
+  const next=last?aD(last.date,cycle):null;
+  const du=next?Math.ceil((new Date(next)-new Date(T()))/86400000):null;
+  const loadD=[{l:'Full',v:D.wash.filter(l=>l.load==='Full').length,c:'#2563a8'},{l:'Half',v:D.wash.filter(l=>l.load==='Half').length,c:'#c47d10'},{l:'Empty',v:D.wash.filter(l=>l.load==='Empty').length,c:'#6b8aa8'}];
+  return`
+  ${next?`<div class="${du<=5?'warn-box':'info-box'}"><div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:4px">${du<=0?'⚠️ Machine Cleaning Overdue':du<=5?'⚠️ Clean Machine Soon':'✅ Machine Cleaning Status'}</div>
+  <div style="font-size:12.5px;color:var(--muted)">Next recommended machine clean: <b style="color:${du<=5?'var(--bad)':'var(--navy)'}">${fD(next)}</b> ${du>0?'(in '+du+' days)':'('+Math.abs(du)+' days overdue)'}</div></div>`:''}
+  <div class="two-col">
+    <div class="left">
+      <div class="card">
+        <div class="card-title">Log a Wash Cycle</div>
+        <div class="g3">
+          <div><span class="fl">Date</span><input class="inp" id="wsh-d" type="date" value="${T()}"></div>
+          <div><span class="fl">Time</span><input class="inp" id="wsh-t" type="time" value="09:00"></div>
+          <div><span class="fl">Load size</span><select class="inp" id="wsh-l"><option>Full</option><option>Half</option><option>Empty</option></select></div>
+        </div>
+        <input class="inp" id="wsh-n" placeholder="Notes (bedsheets, towels, clothes…)" style="margin-bottom:10px">
+        <button class="pbtn" onclick="addWash()">Log Wash</button>
+      </div>
+      <div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:10px">Wash History</div>
+      ${D.wash.slice().sort((a,b)=>a.date>b.date?-1:1).map(l=>{const lc={Full:'#2563a8',Half:'#c47d10',Empty:'#6b8aa8'};return`<div class="row-it"><span style="font-size:20px">🫧</span>
+        <div class="ri-m"><div class="ri-t">${fD(l.date)} at ${l.time}</div><div class="ri-s">${l.notes||'No notes'}</div></div>
+        ${bdg(l.load,lc[l.load]||'#888','var(--sky)')}
+        <button class="rbtn" onclick="removeWash('${l.id}')">✕</button>
+      </div>`;}).join('')}
+    </div>
+    <div class="right">${pieCard(loadD,'Load distribution')}</div>
+  </div>`;
+}
+function addWash(){const d=document.getElementById('wsh-d').value;if(!d)return;D.wash.push({id:uid(),date:d,time:document.getElementById('wsh-t').value,load:document.getElementById('wsh-l').value,notes:document.getElementById('wsh-n').value});nav('washing');}
+function removeWash(id){D.wash=D.wash.filter(x=>x.id!==id);nav('washing');}
+
+// ═══════════════════════════════════════════════
+// MAINTENANCE
+// ═══════════════════════════════════════════════
+function renderMaint(){
+  const sorted=D.maint.slice().sort((a,b)=>a.next>b.next?1:-1);
+  const ov=D.maint.filter(m=>m.next<T()).length;
+  const soon=D.maint.filter(m=>m.next>=T()&&m.next<=aD(T(),14)).length;
+  const cc={HVAC:'#6d28d9',Plumbing:'#0891b2',Electrical:'#c47d10',Pest:'#1a7a4a',Appliance:'#2563a8',Other:'#6b8aa8'};
+  const catAgg=D.maint.reduce((acc,m)=>{acc[m.cat]=(acc[m.cat]||0)+1;return acc;},{});
+  const pieD=Object.entries(catAgg).map(([k,v])=>({l:k,v,c:cc[k]||'#888'}));
+  return`
+  <div class="grid-stats"><div class="stat-box"><div class="stat-n" style="color:var(--bad)">${ov}</div><div class="stat-l">Overdue</div></div><div class="stat-box"><div class="stat-n" style="color:var(--warn)">${soon}</div><div class="stat-l">Due Soon</div></div><div class="stat-box"><div class="stat-n">${D.maint.length}</div><div class="stat-l">Total Tasks</div></div></div>
+  <div class="two-col">
+    <div class="left">
+      <div class="card">
+        <div class="card-title">＋ Add Maintenance Task</div>
+        <div class="g2">
+          <div><span class="fl">Task Name</span><input class="inp" id="mn-n" placeholder="AC Servicing…"></div>
+          <div><span class="fl">Category</span><select class="inp" id="mn-c"><option>HVAC</option><option>Plumbing</option><option>Electrical</option><option>Pest</option><option>Appliance</option><option>Other</option></select></div>
+          <div><span class="fl">Interval (days)</span><input class="inp" id="mn-i" type="number" value="90"></div>
+          <div><span class="fl">Last Completed</span><input class="inp" id="mn-l" type="date" value="${T()}"></div>
+          <div><span class="fl">Est. Cost (NPR)</span><input class="inp" id="mn-co" type="number" placeholder="1500"></div>
+          <div><span class="fl">Notes</span><input class="inp" id="mn-no" placeholder="Notes…"></div>
+        </div>
+        <button class="pbtn" onclick="addMaint()">Add Task</button>
+      </div>
+      ${sorted.map(m=>{
+        const dl=Math.ceil((new Date(m.next)-new Date(T()))/86400000);
+        const st=dl<0?'bad':dl<=14?'warn':'ok';
+        const stc={'bad':'var(--bad)','warn':'var(--warn)','ok':'var(--ok)'}[st];
+        const p=Math.min(100,Math.round((1-dl/m.days)*100));
+        return`<div class="card" style="${st==='bad'?'border:1.5px solid #f0a0a0;background:#fff8f8':st==='warn'?'border:1.5px solid #f0d060':''}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:9px">
+            <div style="flex:1">
+              <div style="font-weight:700;color:var(--navy);font-size:13px">${m.name}</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">${m.cat} · Every ${m.days} days${m.cost?' · NPR '+m.cost.toLocaleString():''}</div>
+              <div style="font-size:12px;font-weight:700;color:${stc};margin-top:4px">${st==='bad'?'⚠️ '+Math.abs(dl)+' days overdue':st==='warn'?'⏰ Due in '+dl+' days':'✅ Next due: '+fD(m.next)}</div>
+              ${m.notes?`<div style="font-size:11px;color:var(--muted)">${m.notes}</div>`:''}
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              ${bdg(m.cat,cc[m.cat]||'#888','var(--sky)')}
+              <button class="gbtn" onclick="markMaintDone('${m.id}')">Done ✓</button>
+              <button class="rbtn" onclick="removeMaint('${m.id}')">✕</button>
+            </div>
+          </div>
+          <div style="margin-top:10px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">Last done: ${fD(m.last)}</div>${prog(Math.max(0,p),stc,6)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="right">${pieCard(pieD,'Tasks by category')}</div>
+  </div>`;
+}
+function addMaint(){const n=document.getElementById('mn-n').value.trim();if(!n)return;const days=parseInt(document.getElementById('mn-i').value)||90,last=document.getElementById('mn-l').value||T();D.maint.push({id:uid(),name:n,cat:document.getElementById('mn-c').value,days,last,next:aD(last,days),cost:parseFloat(document.getElementById('mn-co').value)||0,notes:document.getElementById('mn-no').value,hist:[]});nav('maint');}
+function markMaintDone(id){D.maint=D.maint.map(x=>x.id===id?{...x,last:T(),next:aD(T(),x.days),hist:[...(x.hist||[]),{date:T(),by:CU.name}]}:x);nav('maint');}
+function removeMaint(id){D.maint=D.maint.filter(x=>x.id!==id);nav('maint');}
+
+// ═══════════════════════════════════════════════
+// MEDICINE
+// ═══════════════════════════════════════════════
+function renderMedicine(){
+  const fam=famUsers();
+  const fc={Daily:'#2563a8','Twice daily':'#c47d10',Weekly:'#1a7a4a','As needed':'#6b8aa8'};
+  const pieD=fam.map((u,i)=>({l:u.name.split(' ')[0],v:D.meds.filter(m=>m.aTo===u.id).length,c:CLRS[i]}));
+  return`
+  <div class="two-col">
+    <div class="left">
+      <div class="card">
+        <div class="card-title">＋ Add Medicine</div>
+        <div class="g2">
+          <div><span class="fl">Medicine Name</span><input class="inp" id="md-n" placeholder="Paracetamol…"></div>
+          <div><span class="fl">Dosage</span><input class="inp" id="md-d" placeholder="500mg…"></div>
+          <div><span class="fl">Frequency</span><select class="inp" id="md-f"><option>Daily</option><option>Twice daily</option><option>Weekly</option><option>As needed</option></select></div>
+          <div><span class="fl">For</span><select class="inp" id="md-w">${fam.map(u=>`<option value="${u.id}">${u.name}</option>`).join('')}</select></div>
+          <div><span class="fl">Stock (tablets)</span><input class="inp" id="md-s" type="number" placeholder="30"></div>
+          <div><span class="fl">Notes</span><input class="inp" id="md-no" placeholder="After food…"></div>
+        </div>
+        <button class="pbtn" onclick="addMed()">Add Medicine</button>
+      </div>
+      ${fam.map(u=>{
+        const uM=D.meds.filter(m=>m.aTo===u.id);
+        if(!uM.length)return'';
+        return`<div style="font-weight:700;color:var(--navy);font-size:13px;margin-bottom:10px;margin-top:4px">👤 ${u.name}</div>
+        ${uM.map(m=>{
+          const low=(m.stock||0)<=5;
+          const td=(m.taken||[]).some(t=>t.date===T());
+          return`<div class="card" style="${low?'border:1.5px solid #f0a0a0;background:#fff8f8':''}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:9px">
+              <div style="flex:1">
+                <div style="font-weight:700;color:var(--navy);font-size:13px">${m.name}</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">${m.dose} · ${m.freq} · Stock: <b style="color:${low?'var(--bad)':'var(--ok)'}">${m.stock||0} left</b></div>
+                ${m.notes?`<div style="font-size:11px;color:var(--muted)">${m.notes}</div>`:''}
+                ${low?`<div style="font-size:11px;color:var(--bad);font-weight:700;margin-top:3px">⚠️ Low stock — please refill soon!</div>`:''}
+                ${(m.taken||[]).length?`<div style="font-size:10px;color:var(--muted);margin-top:3px">Last taken: ${m.taken[m.taken.length-1].date}</div>`:''}
+              </div>
+              <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+                ${bdg(m.freq,fc[m.freq]||'#888','var(--sky)')}
+                ${td?bdg('✓ Taken today','#1a7a4a','#e2f5eb'):`<button class="gbtn" onclick="markMedTaken('${m.id}')">Mark Taken</button>`}
+                <button class="rbtn" onclick="removeMed('${m.id}')">✕</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}`;
+      }).join('')}
+    </div>
+    <div class="right">${pieCard(pieD,'Medicines by member')}</div>
+  </div>`;
+}
+function addMed(){const n=document.getElementById('md-n').value.trim();if(!n)return;D.meds.push({id:uid(),name:n,dose:document.getElementById('md-d').value,freq:document.getElementById('md-f').value,aTo:document.getElementById('md-w').value,stock:parseInt(document.getElementById('md-s').value)||30,notes:document.getElementById('md-no').value,taken:[]});nav('medicine');}
+function markMedTaken(id){D.meds=D.meds.map(x=>x.id===id?{...x,taken:[...(x.taken||[]),{date:T(),time:new Date().toLocaleTimeString(),by:CU.name}],stock:Math.max(0,(x.stock||1)-1)}:x);nav('medicine');}
+function removeMed(id){D.meds=D.meds.filter(x=>x.id!==id);nav('medicine');}
+
+// ═══════════════════════════════════════════════
+// FAMILY
+// ═══════════════════════════════════════════════
+function renderFamily(){
+  const myC=conns.filter(c=>(c.from===CU.id||c.to===CU.id)&&c.status==='accepted');
+  const pendIn=conns.filter(c=>c.to===CU.id&&c.status==='pending');
+  const sentOut=conns.filter(c=>c.from===CU.id&&c.status==='pending');
+  const connIds=myC.map(c=>c.from===CU.id?c.to:c.from);
+  const connUsers=connIds.map(i=>users.find(u=>u.id===i)).filter(Boolean);
+  const pending_label=pendIn.length?`<span style="background:var(--bad);color:#fff;font-size:10px;padding:1px 7px;border-radius:20px;margin-left:6px">${pendIn.length}</span>`:'';
+  return`
+  <div class="two-col">
+    <div class="left">
+      <!-- Connected -->
+      <div class="card">
+        <div class="card-title">👨‍👩‍👧 Connected Family Members (${connUsers.length})</div>
+        ${connUsers.length===0?`<div style="font-size:13px;color:var(--muted);padding:8px 0">No family connections yet. Use the search box below to find and connect with family members.</div>`:''}
+        ${connUsers.map((u,i)=>`<div class="row-it">
+          <div style="width:40px;height:40px;border-radius:50%;background:${CLRS[i%CLRS.length]};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">${u.avatar}</div>
+          <div class="ri-m"><div class="ri-t">${u.name}</div><div class="ri-s">${u.role} · ${u.email}</div></div>
+          ${bdg('Connected','#1a7a4a','#e2f5eb')}
+          <button class="rbtn" onclick="disconnectFam('${conns.find(c=>(c.from===CU.id&&c.to===u.id)||(c.to===CU.id&&c.from===u.id))?.id}')">Remove</button>
+        </div>`).join('')}
+      </div>
+
+      <!-- Incoming requests -->
+      ${pendIn.length?`<div class="card" style="background:#e8f4fd;border:1.5px solid #7bb8e8">
+        <div class="card-title">📬 Incoming Requests ${pending_label}</div>
+        ${pendIn.map(c=>{const from=users.find(u=>u.id===c.from);return from?`<div class="row-it">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--warn);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">${from.avatar}</div>
+          <div class="ri-m"><div class="ri-t">${from.name}</div><div class="ri-s">${from.role} · ${from.email}</div></div>
+          <button class="gbtn" onclick="acceptConn('${c.id}')">Accept ✓</button>
+          <button class="rbtn" onclick="declineConn('${c.id}')">Decline</button>
+        </div>`:'';}).join('')}
+      </div>`:''}
+
+      <!-- Sent requests -->
+      ${sentOut.length?`<div class="card">
+        <div class="card-title">📤 Sent Requests (awaiting)</div>
+        ${sentOut.map(c=>{const to=users.find(u=>u.id===c.to);return to?`<div class="row-it">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--muted);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">${to.avatar}</div>
+          <div class="ri-m"><div class="ri-t">${to.name}</div><div class="ri-s">${to.role} · ${to.email}</div></div>
+          ${bdg('Awaiting reply','#c47d10','#fef3e2')}
+          <button class="rbtn" onclick="declineConn('${c.id}')">Cancel</button>
+        </div>`:'';}).join('')}
+      </div>`:''}
+
+      <!-- Search -->
+      <div class="card">
+        <div class="card-title">🔍 Find & Add a Family Member</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">The person you want to connect with must have already created a HomeHub account. Enter their exact email address to send a connection request.</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <input class="inp" id="fam-em" placeholder="Enter their email address…" value="${famSearch}" oninput="famSearch=this.value" onkeydown="if(event.key==='Enter')searchFam()">
+          <button class="pbtn" onclick="searchFam()">Search</button>
+        </div>
+        <div id="fam-res"></div>
+      </div>
+
+      <!-- Activity feed -->
+      <div class="card">
+        <div class="card-title">📰 Family Activity Feed</div>
+        ${D.feed.slice().reverse().slice(0,6).map(f=>`<div style="display:flex;gap:9px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:5px"></div>
+          <div><div style="font-size:12.5px;font-weight:600;color:var(--navy)">${f.user}</div><div style="font-size:11px;color:var(--muted)">${f.action} · ${f.time}</div></div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="right">
+      <div class="card">
+        <div class="card-title">All Users in System</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">These accounts exist and can be connected</div>
+        ${users.map((u,i)=>`<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="width:32px;height:32px;border-radius:50%;background:${CLRS[i%CLRS.length]};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0">${u.avatar}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12.5px;font-weight:600;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.name}${u.id===CU.id?' (You)':''}</div>
+            <div style="font-size:10px;color:var(--muted)">${u.role} · ${u.email}</div>
+          </div>
+          ${connIds.includes(u.id)?bdg('Connected','#1a7a4a','#e2f5eb'):u.id===CU.id?bdg('You','#2563a8','#e6f0fb'):''}
+        </div>`).join('')}
+      </div>
+      <div class="card" style="background:linear-gradient(135deg,#1B3A5C,#2563A8)">
+        <div style="color:#7bc8f0;font-weight:700;font-size:13px;margin-bottom:8px">💡 How sharing works</div>
+        <div style="color:rgba(255,255,255,.82);font-size:12px;line-height:1.7">When connected, both of you can see and edit: tasks, chores, grocery lists, bills, gas logs, medicines, and maintenance records. Changes appear instantly for all family members.</div>
+      </div>
+    </div>
+  </div>`;
+}
+function searchFam(){
+  const email=famSearch.trim().toLowerCase();
+  const res=document.getElementById('fam-res');
+  if(!email){res.innerHTML=`<div style="font-size:12px;color:var(--bad)">Please enter an email address.</div>`;return;}
+  const found=users.find(u=>u.email===email&&u.id!==CU.id);
+  if(!found){res.innerHTML=`<div style="font-size:12px;color:var(--bad)">No user found with this email. They must sign up for HomeHub first.</div>`;return;}
+  const myC=conns.filter(c=>(c.from===CU.id||c.to===CU.id)&&c.status==='accepted');
+  const connIds=myC.map(c=>c.from===CU.id?c.to:c.from);
+  if(connIds.includes(found.id)){res.innerHTML=`<div style="font-size:12px;color:var(--ok)">✓ Already connected with this person!</div>`;return;}
+  const sent=conns.find(c=>c.from===CU.id&&c.to===found.id);
+  if(sent){res.innerHTML=`<div style="font-size:12px;color:var(--warn)">Request already sent. Waiting for them to accept.</div>`;return;}
+  res.innerHTML=`<div class="row-it" style="background:#e8f4fd;border-color:#7bb8e8">
+    <div style="width:38px;height:38px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">${found.avatar}</div>
+    <div class="ri-m"><div class="ri-t">${found.name}</div><div class="ri-s">${found.role} · ${found.email}</div></div>
+    <button class="pbtn" onclick="sendReq('${found.id}')">Send Request</button>
+  </div>`;
+}
+function sendReq(uid){conns.push({id:uid(),from:CU.id,to:uid,status:'pending'});D.feed.push({user:CU.name.split(' ')[0],action:'sent a family connection request',time:'Just now'});famSearch='';nav('family');}
+function acceptConn(cid){conns=conns.map(x=>x.id===cid?{...x,status:'accepted'}:x);nav('family');}
+function declineConn(cid){conns=conns.filter(x=>x.id!==cid);nav('family');}
+function disconnectFam(cid){if(!cid)return;conns=conns.filter(x=>x.id!==cid);nav('family');}
+
+// ═══════════════════════════════════════════════
+// HELP
+// ═══════════════════════════════════════════════
+function renderHelp(){
+  const sections=[
+    {icon:'👨‍👩‍👧',title:'How to Add & Connect Family Members',steps:[
+      {t:'Everyone signs up for HomeHub first',d:'Each family member must create their own account on the Sign Up page. Use any email and set your own password — it only takes a minute.'},
+      {t:'Go to Family & Connections in the sidebar',d:'Click "👨‍👩‍👧 Family & Connections" at the bottom of the sidebar. This is your hub for managing all family connections.'},
+      {t:'Search for your family member by email',d:'Type their exact registered email address in the search box and click Search. Their profile card will appear if they have an account.'},
+      {t:'Click "Send Request"',d:'Click the Send Request button on their profile. They will see it under "Incoming Requests" the next time they log in.'},
+      {t:'They accept the request',d:'The other person logs into their account, goes to Family & Connections, and clicks Accept. Done! You are now connected.'},
+      {t:'Shared data is now visible to both',d:'Once connected, all tasks, chores, grocery lists, bills, gas records, medicines, and maintenance tasks are shared between you automatically.'},
+    ],tip:'Demo accounts ready to connect: aarav@family.com, priya@family.com, riya@family.com — all use password 1234.'},
+    {icon:'✅',title:'To-Do List',steps:[
+      {t:'Add tasks with priority and due date',d:'Type your task, choose High / Medium / Low priority, set a due date, and click Add. All family members can see and check off tasks.'},
+      {t:'Filter by All / Mine / Pending / Done',d:'Use the four filter buttons to see only your tasks (Mine), unfinished tasks (Pending), or completed tasks (Done). The donut chart reflects your current filter.'},
+      {t:'Check off tasks when done',d:'Click the checkbox on any task to mark it complete. It moves to the Done section and the progress chart updates.'},
+    ]},
+    {icon:'📅',title:'Household Calendar',steps:[
+      {t:'The 2-week strip shows upcoming days',d:'Scroll the calendar strip to see the next 14 days. Blue dots appear on days that have events. Today is highlighted in dark blue.'},
+      {t:'Add events of different types',d:'Events, Chores, Birthdays, Medical appointments, and Bills each appear with a different color. Fill in the title, type, date, and time.'},
+      {t:'Upcoming reminders appear automatically',d:'Bill due dates and overdue maintenance tasks from other pages appear in the yellow reminders panel on the right side — no extra setup needed.'},
+    ]},
+    {icon:'🛒',title:'Grocery & 💡 Bills',steps:[
+      {t:'Log grocery items under the right month',d:'Add each item with name, price, quantity, and category. Items group by month. The pie chart shows how your spending is split by category.'},
+      {t:'Switch months to compare spending',d:'Use the month selector dropdown to see any past month. The monthly trend bars show you how spending changed over time.'},
+      {t:'Add bills and mark them paid',d:'In Bills, add electricity, waste management, internet, and water bills with due dates. Overdue bills turn red. Click "Paid ✓" once paid.'},
+    ]},
+    {icon:'⛽',title:'Gas, 💧 Water & 🫧 Washing Machine',steps:[
+      {t:'Gas: log start date when you get a new cylinder',d:'Add a record with the cylinder\'s start date and cost. HomeHub predicts when it will run out based on your average cylinder duration. Click "Mark Empty" when done.'},
+      {t:'Water: log tank level every few days',d:'Log your tank as Full, 75%, 50%, 25%, Low, or Empty. HomeHub estimates how many days of water remain and warns you when the tank is Low.'},
+      {t:'Washing: log each wash and track machine cleanliness',d:'Record each wash cycle with date, time, and load size. HomeHub reminds you when the washing machine itself needs to be cleaned (every 30 days).'},
+    ]},
+    {icon:'🔧',title:'Maintenance Scheduler',steps:[
+      {t:'Add recurring maintenance tasks',d:'Add tasks like "AC Servicing" or "Pest Control" with a repeat interval in days. HomeHub calculates the next due date automatically.'},
+      {t:'Overdue tasks shown in red',d:'Tasks that are past their due date appear in red with "X days overdue". Click "Done ✓" after completing a task to reset the countdown.'},
+      {t:'Progress bar shows urgency',d:'Each task has a progress bar that fills from green to red as the due date approaches.'},
+    ]},
+    {icon:'💊',title:'Medicine Tracker',steps:[
+      {t:'Add medicines for each family member',d:'Select which family member the medicine is for, enter the dosage, frequency, and starting stock count. Connected family members are shown in the dropdown.'},
+      {t:'Mark medicines as taken each day',d:'Click "Mark Taken" to log that a dose was taken today. The button changes to a green "Taken" badge so you don\'t double-dose accidentally.'},
+      {t:'Low stock warning',d:'When stock drops to 5 or fewer tablets, the card turns red with a warning to refill. Each time you mark a dose taken, the stock count decreases by 1.'},
+    ]},
+    {icon:'📊',title:'Budget Planner & 🎯 Savings Goals',steps:[
+      {t:'Set monthly budget limits',d:'In Budget Planner, set spending limits for Grocery, Bills, Gas, and Other. A progress bar shows how much of the budget you have used. Red means over budget.'},
+      {t:'View the Monthly Report for a full summary',d:'Go to 📈 Monthly Report to see your total household spending for any month, with a pie chart and category comparison bars.'},
+      {t:'Create savings goals and track contributions',d:'In Savings Goals, set a target amount (e.g. NPR 50,000 for Dashain), add your starting savings, and log contributions over time. The progress bar fills as you save.'},
+    ]},
+  ];
+  return`
+  <div style="max-width:720px">
+    <div class="help-hero">
+      <h2>🏠 HomeHub Help & Guide</h2>
+      <p>Everything you need to know about using HomeHub to manage your home and family — from connecting with family members to tracking bills, medicines, and maintenance.</p>
+    </div>
+    ${sections.map(s=>`
+    <div class="help-section">
+      <h3>${s.icon} ${s.title}</h3>
+      ${s.steps.map((st,i)=>`<div class="help-step"><div class="hs-num">${i+1}</div><div class="hs-body"><div class="hs-title">${st.t}</div><div class="hs-desc">${st.d}</div></div></div>`).join('')}
+      ${s.tip?`<div class="help-tip">💡 <strong>Tip:</strong> ${s.tip}</div>`:''}
+    </div>`).join('')}
+    <div style="background:var(--sky);border-radius:14px;padding:18px 22px;text-align:center;margin-top:10px">
+      <div style="font-size:16px;margin-bottom:6px">🏠</div>
+      <div style="font-weight:700;color:var(--navy)">HomeHub — Built for families in Nepal</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">All data is shared in real time among connected family members.</div>
+    </div>
+  </div>`;
+}
+</script>
+</body>
+</html>
